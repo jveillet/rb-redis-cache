@@ -1,0 +1,48 @@
+AllCops:
+    TargetRubyVersion: 2.6
+    NewCops: enable
+    Exclude:
+        - 'db/**/*'
+        - 'node_modules/**/*'
+        - 'vendor/**/*'
+        - 'bin/**/*'
+        - 'tmp/**/*'
+
+require:
+  - rubocop-performance
+
+Layout/LineLength:
+    Max: 120
+
+Metrics/BlockLength:
+    Max: 150
+    CountAsOne: ['array', 'heredoc', 'hash']
+    Exclude:
+        - 'Rakefile'
+        - 'rakelib/**/*.rake'
+        - 'spec/**/*.rb'
+        - 'test/**/*.rb'
+
+Metrics/ClassLength:
+    Max: 150
+    CountAsOne: ['array', 'heredoc', 'hash']
+    Exclude:
+        - 'Rakefile'
+        - 'rakelib/**/*.rake'
+        - 'spec/**/*.rb'
+        - 'test/**/*.rb'
+
+Metrics/MethodLength:
+    Max: 20
+
+Layout/TrailingEmptyLines:
+    EnforcedStyle: 'final_newline'
+
+Style/HashTransformValues:
+    Enabled: true
+
+Style/HashTransformKeys:
+    Enabled: true
+
+Style/HashEachMethods:
+    Enabled: true
