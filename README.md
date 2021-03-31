@@ -36,10 +36,15 @@ Cache.config(url: REDIS_URL)
 
 ### Storing objects
 
-You can cache pretty much anything as it is serialized before inserting.
+You can cache simple data structures that can be serialized to JSON.
 
 ```ruby
 Cache.write('my_key', 'my_value')
+```
+
+```ruby
+my_hash = {a: 'a', b: 'b', c: [{ d: 'd' }]}
+Cache.write('my_key', my_hash)
 ```
 
 Optionaly, you can set an expiry time in seconds fot the key.

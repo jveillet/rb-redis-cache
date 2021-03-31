@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cache/version'
+require 'cache/errors'
 require 'logger'
 require 'connection_pool'
 require 'redis'
@@ -125,20 +126,43 @@ module Cache
 
     private
 
+    ##
+    # Serialize value to JSON.
+    #
+    # @param value [String] the value to be serialized to JSON.
+    # @return [JSON] the JSON value.
+    #
     def serialize(value)
       JSON.generate(value)
     end
 
+    ##
+    # Deserialize value to JSON.
+    #
+    # @param value [String] the value to be deserialized from JSON.
+    # @return [mixed] the deserialized value.
+    #
     def deserialize(value)
       JSON.parse(value, symbolize_names: true)
     end
 
+    ##
+    # The redis connection.
+    #
+    # @return [Object] the redis connection instance.
+    #
     def redis
       @redis ||= create_connection(config)
     end
 
+    ##
+    # Creates the redis connection pool.
+    #
+    # @param config [Hash] list of configuration options.
+    # @return [Object] the redis connection instance.
+    #
     def create_connection(config = {})
-      raise 'A Redis URL is not set. Please use the `url` part of the config.' unless config[:url] || test?
+      raise CacheConnectionError unless config[:url] || test?
 
       ConnectionPool.new(timeout: config[:timeout], size: config[:size]) do
         if test?
@@ -149,10 +173,20 @@ module Cache
       end
     end
 
+    ##
+    # Checks if we are in test mode.
+    #
+    # @return [Boolean] true if test mode.
+    #
     def test?
       ENV['ENV'].to_s == 'test'
     end
 
+    ##
+    # Logger instance.
+    #
+    # @return [Object] the logger instance.
+    #
     def logger
       @logger ||= Logger.new($stdout)
     end
