@@ -5,4 +5,6 @@ require 'cache'
 
 require 'minitest/autorun'
 
-Cache.config(url: 'redis://localhost:6379')
+ENV['ENV'] = 'test'
+
+Cache.config

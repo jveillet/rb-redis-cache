@@ -21,7 +21,7 @@ class CacheTest < Minitest::Test
 
   def test_it_doesnt_reads_into_the_cache
     result = Cache.read('test/string/1234')
-    assert result == nil
+    assert result.nil?
   end
 
   def test_it_fetch_and_read_into_the_cache
@@ -63,7 +63,7 @@ class CacheTest < Minitest::Test
   end
 
   def test_it_writes_json_into_the_cache
-    message = {a: 'test', b: 'azerty'}
+    message = { a: 'test', b: 'azerty' }
     result = Cache.write('test/json', message)
     assert result == 'OK'
   end

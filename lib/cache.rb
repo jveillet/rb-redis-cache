@@ -4,7 +4,13 @@ require 'cache/version'
 require 'logger'
 require 'connection_pool'
 require 'redis'
+require 'mock_redis'
+require 'json'
 
+##
+# Redis Cache library.
+# This library can read and write data into Redis via the redis-rb gem.
+#
 module Cache
   class << self
     ##
@@ -120,11 +126,11 @@ module Cache
     private
 
     def serialize(value)
-      Marshal.dump(value)
+      JSON.generate(value)
     end
 
     def deserialize(value)
-      Marshal.load(value)
+      JSON.parse(value, symbolize_names: true)
     end
 
     def redis
@@ -132,11 +138,19 @@ module Cache
     end
 
     def create_connection(config = {})
-      raise 'REDIS_URL not set' unless config[:url]
+      raise 'A Redis URL is not set. Please use the `url` part of the config.' unless config[:url] || test?
 
       ConnectionPool.new(timeout: config[:timeout], size: config[:size]) do
-        Redis.new(config)
+        if test?
+          MockRedis.new
+        else
+          Redis.new(config)
+        end
       end
+    end
+
+    def test?
+      ENV['ENV'].to_s == 'test'
     end
 
     def logger
