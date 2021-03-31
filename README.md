@@ -1,5 +1,7 @@
 # rb-redis-cache
 
+[![Build Status](https://github.com/jveillet/rb-redis-cache/workflows/CI/badge.svg)](https://github.com/rb-redis-cache/actions)
+
 A simple framework-agnostic cache with Redis.
 
 ## Installation

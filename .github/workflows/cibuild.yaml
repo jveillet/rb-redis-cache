@@ -1,0 +1,29 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6
+        bundler-cache: true
+
+    - name: Run linter
+      run: |
+        gem install bundler --no-document
+        bundle install --jobs 4 --retry 3
+        bundle exec rubocop
+
+    - name: Run Test Suite
+      run: |
+        bundle exec rake test
+      env:
+        ENV: test
