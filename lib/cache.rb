@@ -5,7 +5,6 @@ require 'cache/errors'
 require 'logger'
 require 'connection_pool'
 require 'redis'
-require 'mock_redis'
 require 'json'
 
 ##
@@ -166,6 +165,7 @@ module Cache
 
       ConnectionPool.new(timeout: config[:timeout], size: config[:size]) do
         if test?
+          require 'mock_redis'
           MockRedis.new
         else
           Redis.new(config)
