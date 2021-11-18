@@ -78,9 +78,9 @@ Cache.increment('my_key_inc')
 => 2
 ```
 
-### Decrements the number stored at key by decrement.
+### Decrementing a counter
 
-Increments the number stored at key by increment.
+Decrements the number stored at key by decrement.
 
 ```ruby
 Cache.increment('my_key_inc')
