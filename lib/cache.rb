@@ -101,7 +101,7 @@ module Cache
     end
 
     ##
-    # Increments the number stored at key by one.
+    # Increments the number stored at key by increment.
     #
     # @param key [String] the cache key namespace.
     # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
@@ -110,6 +110,22 @@ module Cache
     def increment(key, amount = 1, options = nil)
       redis.with do |conn|
         conn.incrby(key, amount).tap do
+          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{amount}")
+          expire(conn, key, options)
+        end
+      end
+    end
+
+    ##
+    # Decrements the number stored at key by decrement.
+    #
+    # @param key [String] the cache key namespace.
+    # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
+    # @return [Integer] the total increment value.
+    #
+    def decrement(key, amount = 1, options = nil)
+      redis.with do |conn|
+        conn.decrby(key, amount).tap do
           logger.info("cache.write=1 cache.key=#{key}, cache.value=#{amount}")
           expire(conn, key, options)
         end
