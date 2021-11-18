@@ -64,6 +64,20 @@ Cache.read('my_key')
 => 'my_value'
 ```
 
+### Increment a counter
+
+Increments the number stored at key by one.
+
+```ruby
+Cache.increment('my_key_inc')
+=> 1
+```
+
+```ruby
+Cache.increment('my_key_inc')
+=> 2
+```
+
 ### Rails-style fetching
 
 You can fetch a key from the cache, if there is an existing value for a given key, then this value is returned.
@@ -72,6 +86,7 @@ If there is no value for the given key, and a block parameter has been passed, t
 ```ruby
 Cache.fetch('my_key', expires_in: 60) do
   block_method_calculation
+end
 => 'my_value'
 ```
 

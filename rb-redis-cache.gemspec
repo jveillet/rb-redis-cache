@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mock_redis', '~> 0.27.3'
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rubocop', '~> 0.91.0'
+  spec.add_development_dependency 'rubocop-minitest', '~> 0.16.0'
   spec.add_development_dependency 'rubocop-performance', '~> 1.6', '>= 1.6.1'
   spec.add_development_dependency 'yard', '~> 0.9.26'
 
