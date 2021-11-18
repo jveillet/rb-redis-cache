@@ -86,4 +86,12 @@ class CacheTest < Minitest::Test
     result = Cache.increment('test/inc', 1)
     assert_equal(2, result)
   end
+
+  def test_it_decrements_a_counter
+    Cache.delete('test/inc')
+    Cache.increment('test/inc', 1)
+    Cache.increment('test/inc', 1)
+    result = Cache.decrement('test/inc')
+    assert_equal(1, result)
+  end
 end

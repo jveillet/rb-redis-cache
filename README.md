@@ -64,9 +64,9 @@ Cache.read('my_key')
 => 'my_value'
 ```
 
-### Increment a counter
+### Incrementing a counter
 
-Increments the number stored at key by one.
+Increments the number stored at key by increment.
 
 ```ruby
 Cache.increment('my_key_inc')
@@ -76,6 +76,17 @@ Cache.increment('my_key_inc')
 ```ruby
 Cache.increment('my_key_inc')
 => 2
+```
+
+### Decrements the number stored at key by decrement.
+
+Increments the number stored at key by increment.
+
+```ruby
+Cache.increment('my_key_inc')
+Cache.increment('my_key_inc')
+Cache.decrement('my_key_inc')
+=> 1
 ```
 
 ### Rails-style fetching

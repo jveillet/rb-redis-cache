@@ -24,6 +24,9 @@ Metrics/BlockLength:
         - 'spec/**/*.rb'
         - 'test/**/*.rb'
 
+Metrics/ModuleLength:
+    Max: 300
+
 Metrics/ClassLength:
     Max: 150
     CountAsOne: ['array', 'heredoc', 'hash']
