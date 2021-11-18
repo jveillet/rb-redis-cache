@@ -101,6 +101,36 @@ module Cache
     end
 
     ##
+    # Increments the number stored at key by one.
+    #
+    # @param key [String] the cache key namespace.
+    # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
+    # @return [Integer] the total increment value.
+    #
+    def increment(key, amount = 1, options = nil)
+      redis.with do |conn|
+        conn.incrby(key, amount).tap do
+          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{amount}")
+          expire(conn, key, options)
+        end
+      end
+    end
+
+    ##
+    # Sets expiration time on a key, a posteriori.
+    #
+    # @param client [Object] a redis connection client instance.
+    # @param key [String] the cache key namespace.
+    # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
+    #
+    def expire(client, key, options)
+      return unless options && options[:expires_in] && client.ttl(key).negative?
+
+      logger.info("cache.write=1 cache.key=#{key}, cache.expiry=#{options[:expires_in].to_i}")
+      client.expire key, options[:expires_in].to_i
+    end
+
+    ##
     # Deletes keys in the cache
     #
     # @param keys [Array] the list of keys to delete.
@@ -122,6 +152,8 @@ module Cache
         conn.exists?(key)
       end
     end
+
+    alias_method :exist?, :exists?
 
     private
 
