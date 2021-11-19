@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-require 'cache'
+require 'redis_cache'
 
 require 'minitest/autorun'
 
 ENV['ENV'] = 'test'
-
-Cache.config

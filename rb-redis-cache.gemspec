@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'lib/cache/version'
+require_relative 'lib/redis_cache/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'rb-redis-cache'
-  spec.version = Cache::VERSION
+  spec.version = RedisCache::VERSION
   spec.authors = ['Jérémie Veillet']
   spec.email = ['jveillet@hey.com']
   spec.summary = 'A simple framework-agnostic cache with Redis.'
