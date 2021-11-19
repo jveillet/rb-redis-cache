@@ -2,7 +2,6 @@
 
 require 'redis_cache/version'
 require 'redis_cache/errors'
-require 'logger'
 require 'connection_pool'
 require 'redis'
 require 'json'
@@ -88,15 +87,9 @@ module RedisCache
         conn.get(key)
       end
 
-      if response.nil?
-        logger.info("cache.miss=1 cache.key=#{key}")
-        return nil
-      end
+      return nil unless response
 
-      deserialized_value = deserialize(response)
-      logger.info("cache.hit=1 cache.key=#{key} cache.value=#{deserialized_value}")
-
-      deserialized_value
+      deserialize(response)
     end
 
     ##
@@ -110,10 +103,8 @@ module RedisCache
     def write(key, value, options = {})
       redis.with do |conn|
         if options[:expires_in]
-          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{value} cache.expires_in=#{options[:expires_in]}")
           conn.setex(key, options[:expires_in], serialize(value))
         else
-          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{value}")
           conn.set(key, serialize(value))
         end
       end
@@ -153,7 +144,6 @@ module RedisCache
     def increment(key, amount = 1, options = nil)
       redis.with do |conn|
         conn.incrby(key, amount).tap do
-          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{amount}")
           expire(conn, key, options)
         end
       end
@@ -169,7 +159,6 @@ module RedisCache
     def decrement(key, amount = 1, options = nil)
       redis.with do |conn|
         conn.decrby(key, amount).tap do
-          logger.info("cache.write=1 cache.key=#{key}, cache.value=#{amount}")
           expire(conn, key, options)
         end
       end
@@ -185,7 +174,6 @@ module RedisCache
     def expire(client, key, options)
       return unless options && options[:expires_in] && client.ttl(key).negative?
 
-      logger.info("cache.write=1 cache.key=#{key}, cache.expiry=#{options[:expires_in].to_i}")
       client.expire key, options[:expires_in].to_i
     end
 
@@ -234,15 +222,6 @@ module RedisCache
     #
     def deserialize(value)
       JSON.parse(value, symbolize_names: true)
-    end
-
-    ##
-    # Logger instance.
-    #
-    # @return [Object] the logger instance.
-    #
-    def logger
-      @logger ||= Logger.new($stdout)
     end
   end
 end
