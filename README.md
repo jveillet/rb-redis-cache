@@ -4,6 +4,8 @@
 
 A simple framework-agnostic cache with Redis.
 
+⚠️ This gem is still under development, the api is not stable and there might be breaking changes until we reach v1.0.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -28,39 +30,47 @@ gem install rb-redis-cache
 
 ### Connection
 
-You can connect to Redis by configuring the Cache class:
+You can connect to Redis by configuring the `RedisCache::Store` class:
 
 ```ruby
-require 'cache'
+require 'redis_cache'
 
-Cache.config(url: REDIS_URL)
+cache = RedisCache::Store.new(url: REDIS_URL)
 ```
+
+Alternatively, you can pass options to the `Store` instance:
+
+```ruby
+require 'redis_cache'
+
+cache = RedisCache::Store.new(url: REDIS_URL, connect_timeout: 10)
+```
+
+Defaults are defined in [lib/redis_cache.rb](lib/redis_cache.rb#L17) and can be overrided.
 
 ### Storing objects
 
-You can cache simple data structures that can be serialized to JSON.
+You can store data structures that can be serialized to JSON.
 
 ```ruby
-Cache.write('my_key', 'my_value')
+cache.write('my_key', 'my_value')
 ```
 
 ```ruby
 my_hash = {a: 'a', b: 'b', c: [{ d: 'd' }]}
-Cache.write('my_key', my_hash)
+cache.write('my_key', my_hash)
 ```
 
 Optionaly, you can set an expiry time in seconds fot the key.
 
 ```ruby
-Cache.write('my_key', 'my_value', expires_in: 60)
+cache.write('my_key', 'my_value', expires_in: 60)
 ```
 
 ### Retrieving objects
 
-You can cache pretty much anything as it is serialized before inserting.
-
 ```ruby
-Cache.read('my_key')
+cache.read('my_key')
 => 'my_value'
 ```
 
@@ -69,12 +79,9 @@ Cache.read('my_key')
 Increments the number stored at key by increment.
 
 ```ruby
-Cache.increment('my_key_inc')
+cache.increment('my_key_inc')
 => 1
-```
-
-```ruby
-Cache.increment('my_key_inc')
+cache.increment('my_key_inc')
 => 2
 ```
 
@@ -83,9 +90,11 @@ Cache.increment('my_key_inc')
 Decrements the number stored at key by decrement.
 
 ```ruby
-Cache.increment('my_key_inc')
-Cache.increment('my_key_inc')
-Cache.decrement('my_key_inc')
+cache.increment('my_key_inc')
+=> 1
+cache.increment('my_key_inc')
+=> 2
+cache.decrement('my_key_inc')
 => 1
 ```
 
@@ -95,7 +104,7 @@ You can fetch a key from the cache, if there is an existing value for a given ke
 If there is no value for the given key, and a block parameter has been passed, then the result will be cached and returned.
 
 ```ruby
-Cache.fetch('my_key', expires_in: 60) do
+cache.fetch('my_key', expires_in: 60) do
   block_method_calculation
 end
 => 'my_value'

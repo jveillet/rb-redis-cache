@@ -1,37 +1,80 @@
 # frozen_string_literal: true
 
-require 'cache/version'
-require 'cache/errors'
+require 'redis_cache/version'
+require 'redis_cache/errors'
 require 'logger'
 require 'connection_pool'
 require 'redis'
 require 'json'
 
-##
-# Redis Cache library.
-# This library can read and write data into Redis via the redis-rb gem.
-#
-module Cache
-  class << self
+module RedisCache
+  ##
+  # Redis Cache library.
+  # This library can read and write data into Redis via the redis-rb gem.
+  #
+  class Store
+    class << self
+      DEFAULT_REDIS_OPTIONS = {
+        connect_timeout: 20,
+        read_timeout: 1,
+        write_timeout: 1,
+        timeout: 1,
+        reconnect_attempts: 0,
+        reconnect_delay: 1,
+        reconnect_delay_max: 2,
+        size: 3
+      }.freeze
+
+      ##
+      # Build the redis connection.
+      #
+      # @param url [String] URL of the redis instance.
+      # @param options [Hash] options list for redis configuration.
+      #
+      def build_redis(url: nil, **options)
+        redis_options = DEFAULT_REDIS_OPTIONS.merge(options.merge(url: url))
+        create_connection(**redis_options)
+      end
+
+      ##
+      # Creates the redis connection pool.
+      #
+      # @param config [Hash] list of configuration options.
+      # @return [Object] the redis connection instance.
+      #
+      def create_connection(**options)
+        raise CacheConnectionError unless options[:url] || test?
+
+        ConnectionPool.new(timeout: options[:timeout], size: options[:size]) do
+          if test?
+            require 'mock_redis'
+            MockRedis.new
+          else
+            Redis.new(options)
+          end
+        end
+      end
+
+      private
+
+      def test?
+        ENV['ENV'].to_s == 'test'
+      end
+    end
+
+    attr_reader :options
+
+    def initialize(**options)
+      @options = options
+    end
+
     ##
-    # Configuration method.
+    # The redis connection.
     #
-    # @param url [String] the url of the Redis instance.
-    # @param timeout [Integer] the Redis timeout value.
-    # @param reconnect_attempts [Integer] the number of reconnect attempts of Redis.
-    # @param reconnect_delay [Integer] the delay between reconnect attemps of Redis.
-    # @param reconnect_delay_max [Integer] the maximum delay between reconnect attempts of Redis.
-    # @param size [Integer] the pool size for the Redis connection.
+    # @return [Object] the redis connection instance.
     #
-    def config(url: nil, timeout: 1, reconnect_attempts: 2, reconnect_delay: 1, reconnect_delay_max: 2, size: 5)
-      @config ||= {
-        url: url,
-        timeout: timeout,
-        reconnect_attempts: reconnect_attempts,
-        reconnect_delay: reconnect_delay,
-        reconnect_delay_max: reconnect_delay_max,
-        size: size
-      }
+    def redis
+      @redis ||= self.class.build_redis(**options)
     end
 
     ##
@@ -191,43 +234,6 @@ module Cache
     #
     def deserialize(value)
       JSON.parse(value, symbolize_names: true)
-    end
-
-    ##
-    # The redis connection.
-    #
-    # @return [Object] the redis connection instance.
-    #
-    def redis
-      @redis ||= create_connection(config)
-    end
-
-    ##
-    # Creates the redis connection pool.
-    #
-    # @param config [Hash] list of configuration options.
-    # @return [Object] the redis connection instance.
-    #
-    def create_connection(config = {})
-      raise CacheConnectionError unless config[:url] || test?
-
-      ConnectionPool.new(timeout: config[:timeout], size: config[:size]) do
-        if test?
-          require 'mock_redis'
-          MockRedis.new
-        else
-          Redis.new(config)
-        end
-      end
-    end
-
-    ##
-    # Checks if we are in test mode.
-    #
-    # @return [Boolean] true if test mode.
-    #
-    def test?
-      ENV['ENV'].to_s == 'test'
     end
 
     ##
