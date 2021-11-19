@@ -165,19 +165,6 @@ module RedisCache
     end
 
     ##
-    # Sets expiration time on a key, a posteriori.
-    #
-    # @param client [Object] a redis connection client instance.
-    # @param key [String] the cache key namespace.
-    # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
-    #
-    def expire(client, key, options)
-      return unless options && options[:expires_in] && client.ttl(key).negative?
-
-      client.expire key, options[:expires_in].to_i
-    end
-
-    ##
     # Deletes keys in the cache
     #
     # @param keys [Array] the list of keys to delete.
@@ -203,6 +190,19 @@ module RedisCache
     alias_method :exist?, :exists?
 
     private
+
+    ##
+    # Sets expiration time on a key, a posteriori.
+    #
+    # @param client [Object] a redis connection client instance.
+    # @param key [String] the cache key namespace.
+    # @param options [Hash] a dictionnary containing options for the cache, like expiry settings.
+    #
+    def expire(client, key, options)
+      return unless options && options[:expires_in] && client.ttl(key).negative?
+
+      client.expire key, options[:expires_in].to_i
+    end
 
     ##
     # Serialize value to JSON.

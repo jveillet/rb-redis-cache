@@ -98,6 +98,25 @@ cache.decrement('my_key_inc')
 => 1
 ```
 
+### Testing if a key exist
+
+```ruby
+cache.write('my_key', 'my_value')
+cache.exist?('my_key')
+=> true
+```
+
+```ruby
+cache.exist?('my_other_key')
+=> false
+```
+
+### Deleting a key
+
+```ruby
+cache.delete('my_key')
+```
+
 ### Rails-style fetching
 
 You can fetch a key from the cache, if there is an existing value for a given key, then this value is returned.
