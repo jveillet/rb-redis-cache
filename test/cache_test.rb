@@ -91,11 +91,24 @@ class CacheTest < Minitest::Test
     assert_equal(2, result)
   end
 
-  def test_it_decrements_a_counter
+  def test_it_increments_a_counter_by_ten
     cache.delete('test/inc')
-    cache.increment('test/inc', 1)
-    cache.increment('test/inc', 1)
-    result = cache.decrement('test/inc')
+    result = cache.increment('test/inc', 10)
+    assert_equal(10, result)
+  end
+
+  def test_it_decrements_a_counter
+    cache.delete('test/dec')
+    cache.increment('test/dec', 1)
+    cache.increment('test/dec', 1)
+    result = cache.decrement('test/dec')
     assert_equal(1, result)
+  end
+
+  def test_it_decrements_a_counter_by_10
+    cache.delete('test/dec')
+    cache.increment('test/dec', 1)
+    result = cache.decrement('test/dec', 10)
+    assert_equal(-9, result)
   end
 end
